@@ -69,8 +69,16 @@ const viewSelf = async (req, res, next) => {
   return res.send({ data: req.user });
 };
 
+const logout = async (req, res, next) => {
+  res.cookie("token", null, {
+    expires: new Date(Date.now()),
+  });
+  res.send({ message: "User logged out." });
+};
+
 module.exports = {
   register,
   login,
   viewSelf,
+  logout,
 };
