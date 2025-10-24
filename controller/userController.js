@@ -4,6 +4,8 @@ const jwt = require("jsonwebtoken");
 const {
   registerUser,
   loginUser,
+  updatedUser,
+  updateUser,
 } = require("../database/repository/userRepository");
 
 const register = async (req, res, next) => {
@@ -65,10 +67,6 @@ const login = async (req, res, next) => {
   return res.status(200).send({ message: "User has been logged in." });
 };
 
-const viewSelf = async (req, res, next) => {
-  return res.send({ data: req.user });
-};
-
 const logout = async (req, res, next) => {
   res.cookie("token", null, {
     expires: new Date(Date.now()),
@@ -76,9 +74,30 @@ const logout = async (req, res, next) => {
   res.send({ message: "User logged out." });
 };
 
+const viewSelf = async (req, res, next) => {
+  return res.send({ data: req.user });
+};
+
+const updateSelf = async (req, res, next) => {
+  try {
+    const data = req.body;
+    // console.log("Data >>>>>", data);
+    const id = req.user._id;
+    const updatedUser = await updateUser(data, id);
+    res.send({
+      message: "User details updated successfully.",
+      data: updatedUser,
+    });
+  } catch (err) {
+    console.log("Error at /api/v1/user/profile/edit >>>", err.message);
+    throw new Error(err);
+  }
+};
+
 module.exports = {
   register,
   login,
   viewSelf,
   logout,
+  updateSelf,
 };

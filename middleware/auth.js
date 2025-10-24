@@ -14,7 +14,7 @@ const userAuth = async (req, res, next) => {
   const { userId } = decodedData;
 
   const user = await User.findById(userId);
-  console.log(user);
+  // console.log(user);
   req.user = user;
   next();
 };

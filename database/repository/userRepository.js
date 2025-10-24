@@ -37,7 +37,26 @@ const loginUser = async (email, password) => {
   }
 };
 
+const updateUser = async (data, id) => {
+  const allowedEditFields = ["firstName", "lastName", "age", "hobbies"];
+  const editFields = Object.keys(data).filter((field) =>
+    allowedEditFields.includes(field)
+  );
+  // console.log("edit fields >>", editFields);
+
+  const updateData = {};
+  editFields.forEach((field) => {
+    updateData[field] = data[field];
+  });
+
+  const updatedUser = await User.findByIdAndUpdate(id, updateData, {
+    new: true,
+  });
+  return updatedUser;
+};
+
 module.exports = {
   registerUser,
   loginUser,
+  updateUser,
 };
