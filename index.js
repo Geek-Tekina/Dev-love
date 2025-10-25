@@ -2,6 +2,7 @@ const express = require("express");
 const cookieParser = require("cookie-parser");
 const { dbConnect } = require("./db/connection");
 const { userRouter } = require("./routes/userRoute");
+const { connectionRouter } = require("./routes/connectionRoute");
 
 const app = express();
 
@@ -11,6 +12,7 @@ app.use(cookieParser());
 const PORT = process.env.PORT || 3001;
 
 app.use("/api/v1/user", userRouter);
+app.use("/api/v1/connection", connectionRouter);
 
 app.use("/", (err, req, res, next) => {
   if (err) {

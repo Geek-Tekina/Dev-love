@@ -43,7 +43,7 @@ const login = async (req, res, next) => {
   const { email, password } = req.body;
 
   const isUserExists = await User.findOne({ email: email });
-  console.log(isUserExists);
+  // console.log(isUserExists);
   if (!isUserExists) {
     return res.status(404).send({ message: "Wrong Credentials." });
   }
