@@ -38,7 +38,44 @@ const reviewRequest = async (reqId, status, loggedInUserId) => {
   return req;
 };
 
+const pendingRequest = async (userId) => {
+  const pendingReq = await ConnectionRequest.find({
+    toUserId: userId,
+    status: "interested",
+  })
+    .populate("fromUserId", "firstName lastName")
+    .select("fromUserId");
+  if (!pendingReq[0]) {
+    return null;
+  }
+  return pendingReq;
+};
+
+const getConnections = async (userId) => {
+  const connc = await ConnectionRequest.find({
+    $or: [
+      { toUserId: userId, status: "accepted" },
+      { fromUserId: userId, status: "accepted" },
+    ],
+  })
+    .populate("fromUserId", "firstName lastName")
+    .populate("toUserId", "firstName lastName")
+    .select("fromUserId");
+
+  if (!connc[0]) return null;
+
+  const data = connc.map((row) => {
+    if (row.fromUserId._id.toString() === userId.toString()) {
+      return row.toUserId;
+    }
+    return row.fromUserId;
+  });
+  return data;
+};
+
 module.exports = {
   sendRequest,
   reviewRequest,
+  pendingRequest,
+  getConnections,
 };

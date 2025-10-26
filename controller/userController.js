@@ -8,6 +8,10 @@ const {
   updateUser,
 } = require("../database/repository/userRepository");
 
+const USER_SAFE_DATA = "firstName lastName age hobbies";
+
+const { ConnectionRequest } = require("../database/models/connectionRequest");
+
 const register = async (req, res, next) => {
   try {
     const { firstName, lastName, email, age, password, hobbies } = req.body;
@@ -94,10 +98,46 @@ const updateSelf = async (req, res, next) => {
   }
 };
 
+const getFeed = async (req, res) => {
+  try {
+    const loggedInUser = req.user;
+
+    const page = parseInt(req.query.page) || 1;
+    let limit = parseInt(req.query.limit) || 10;
+    limit = limit > 50 ? 50 : limit;
+    const skip = (page - 1) * limit;
+
+    const connectionRequests = await ConnectionRequest.find({
+      $or: [{ fromUserId: loggedInUser._id }, { toUserId: loggedInUser._id }],
+    }).select("fromUserId  toUserId");
+
+    const hideUsersFromFeed = new Set();
+    connectionRequests.forEach((req) => {
+      hideUsersFromFeed.add(req.fromUserId.toString());
+      hideUsersFromFeed.add(req.toUserId.toString());
+    });
+
+    const users = await User.find({
+      $and: [
+        { _id: { $nin: Array.from(hideUsersFromFeed) } },
+        { _id: { $ne: loggedInUser._id } },
+      ],
+    })
+      .select(USER_SAFE_DATA)
+      .skip(skip)
+      .limit(limit);
+
+    res.json({ data: users });
+  } catch (err) {
+    console.log("Error at /api/v1/user/getFeed >>>", err.message);
+    throw new Error(err);
+  }
+};
 module.exports = {
   register,
   login,
   viewSelf,
   logout,
   updateSelf,
+  getFeed,
 };

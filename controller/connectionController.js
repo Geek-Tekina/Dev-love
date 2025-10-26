@@ -1,6 +1,8 @@
 const {
   sendRequest,
   reviewRequest,
+  pendingRequest,
+  getConnections,
 } = require("../database/repository/connectionRepository");
 
 const sendConnectionRequest = async (req, res, next) => {
@@ -63,7 +65,41 @@ const reviewConnectionRequest = async (req, res, next) => {
   }
 };
 
+const pendingConnectionRequest = async (req, res, next) => {
+  try {
+    const pendingReqs = await pendingRequest(req.user._id);
+    if (pendingReqs == null) {
+      return res.send({ message: "No pending connection requests" });
+    }
+    return res.send({
+      message: "These are pending connection requests.",
+      data: pendingReqs,
+    });
+  } catch (err) {
+    console.log("Error at /api/v1/connection/pending >>>", err.message);
+    throw new Error(err);
+  }
+};
+
+const connections = async (req, res, next) => {
+  try {
+    const connections = await getConnections(req.user._id);
+    if (connections == null) {
+      return res.send({ message: "You have no connections." });
+    }
+    return res.send({
+      message: "These are your connections.",
+      data: connections,
+    });
+  } catch (err) {
+    console.log("Error at /api/v1/connection/getConnections >>>", err.message);
+    throw new Error(err);
+  }
+};
+
 module.exports = {
   sendConnectionRequest,
   reviewConnectionRequest,
+  pendingConnectionRequest,
+  connections,
 };

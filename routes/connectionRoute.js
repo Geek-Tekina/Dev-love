@@ -2,6 +2,8 @@ const express = require("express");
 const {
   sendConnectionRequest,
   reviewConnectionRequest,
+  pendingConnectionRequest,
+  connections,
 } = require("../controller/connectionController");
 const { userAuth } = require("../middleware/auth");
 
@@ -18,6 +20,10 @@ connectionRouter.post(
   userAuth,
   reviewConnectionRequest
 );
+
+connectionRouter.get("/pending", userAuth, pendingConnectionRequest);
+
+connectionRouter.get("/getConnections", userAuth, connections);
 
 module.exports = {
   connectionRouter,

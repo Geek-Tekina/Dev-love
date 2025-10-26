@@ -5,6 +5,7 @@ const {
   viewSelf,
   logout,
   updateSelf,
+  getFeed,
 } = require("../controller/userController");
 const { userAuth } = require("../middleware/auth");
 
@@ -15,6 +16,7 @@ userRouter.post("/login", login);
 userRouter.get("/logout", logout);
 userRouter.get("/profile/view", userAuth, viewSelf);
 userRouter.patch("/profile/edit", userAuth, updateSelf);
+userRouter.get("/feed", userAuth, getFeed);
 
 module.exports = {
   userRouter,
